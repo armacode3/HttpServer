@@ -15,6 +15,14 @@ const platform = () => {
         throw new Error("PLATFORM does not exist");
     }
 };
+const secret = () => {
+    if (process.env["SECRET"] !== undefined) {
+        return process.env["SECRET"];
+    }
+    else {
+        throw new Error("SECRET does not exist");
+    }
+};
 export const config = {
     dbConfig: {
         dbURL: dbUrl(),
@@ -25,6 +33,7 @@ export const config = {
     apiConfig: {
         fileServerHits: 0,
         dbURL: dbUrl(),
-        platform: platform()
+        platform: platform(),
+        secret: secret(),
     }
 };

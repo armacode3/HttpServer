@@ -1,12 +1,23 @@
-import { BadRequest } from "./errors.js";
+import { BadRequest, Unauthorized } from "./errors.js";
 import { createChirp, getChirps, getChirp } from "../db/queries/chirps.js";
+import { validateJWT, getBearerToken } from "../auth.js";
+import { config } from "../config.js";
 export async function handlerChirpsCreate(req, res) {
+    const token = getBearerToken(req);
+    const userId = validateJWT(token, config.apiConfig.secret);
+    if (!userId) {
+        throw new Unauthorized("Error: Could not validate user");
+    }
+    const { body } = req.body;
+    if (typeof body !== "string") {
+        throw new BadRequest("Chirp is required");
+    }
     const profane = ["kerfuffle", "sharbert", "fornax"];
     let cleanedBody = [];
-    if (req.body.body.length > 140) {
+    if (body.length > 140) {
         throw new BadRequest("Chirp is too long. Max length is 140");
     }
-    const splitBody = req.body.body.split(" ");
+    const splitBody = body.split(" ");
     for (let word of splitBody) {
         let lowWord = word.toLowerCase();
         if (profane.includes(lowWord)) {
@@ -17,7 +28,7 @@ export async function handlerChirpsCreate(req, res) {
         }
     }
     const newBody = cleanedBody.join(" ");
-    const result = await createChirp({ body: newBody, user_id: req.body.userId });
+    const result = await createChirp({ body: newBody, user_id: userId });
     res.status(201).send({ id: result.id, createdAt: result.createdAt, updatedAt: result.updatedAt, body: result.body, userId: result.user_id });
 }
 export async function handlerChirps(req, res) {

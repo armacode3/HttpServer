@@ -4,7 +4,7 @@ import { middlewareLogResponses } from "./api/responses.js";
 import { middlewareMetricsInc, handlerMetrics, handlerReset } from "./api/metrics.js";
 import { handlerChirpsCreate, handlerChirps, handlerGetChirp } from "./api/chirps.js";
 import { middlewareError } from "./api/errors.js";
-import { handlerUsers, handlerLogin } from "./api/users.js";
+import { handlerUsers, handlerLogin, handlerRefesh, handlerRevoke } from "./api/users.js";
 const app = express();
 const PORT = 8080;
 app.use(express.json());
@@ -58,6 +58,22 @@ app.post("/api/users", async (req, res, next) => {
 app.post("/api/login", async (req, res, next) => {
     try {
         await handlerLogin(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.post("/api/refresh", async (req, res, next) => {
+    try {
+        await handlerRefesh(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.post("/api/revoke", async (req, res, next) => {
+    try {
+        await handlerRevoke(req, res);
     }
     catch (err) {
         next(err);
