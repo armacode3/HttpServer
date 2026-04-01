@@ -1,8 +1,8 @@
 import { Response, Request } from "express";
-import { createUser, getUser } from "../db/queries/users.js"
+import { createUser, getUser, updateUser } from "../db/queries/users.js"
 import { insertRefreshToken, getRefreshToken, updateRefreshToken } from "../db/queries/refresh_tokens.js";
 import { BadRequest, Unauthorized } from "./errors.js";
-import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken, getBearerToken } from "../auth.js";
+import { hashPassword, checkPasswordHash, makeJWT, makeRefreshToken, getBearerToken, validateJWT } from "../auth.js";
 import { config } from "../config.js";
 
 export async function handlerUsers(req: Request, res: Response) {
@@ -72,4 +72,34 @@ export async function handlerRevoke(req: Request, res: Response) {
     await updateRefreshToken(token);
 
     res.status(204).send();
+}
+
+export async function handlerUpdate(req: Request, res: Response) {
+    const { password, email } = req.body;
+
+    if (email === undefined || password === undefined) {
+        throw new BadRequest("Error occurred in adding user");
+    }
+
+
+    const token = getBearerToken(req);
+
+    if(!token) {
+        throw new Unauthorized("Missing or malformed access token");
+    }
+
+    const userId = validateJWT(token, config.apiConfig.secret);
+
+    if (!userId) {
+        throw new Unauthorized("Missing or malformed access token");
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await updateUser(userId, email, hashedPassword);
+    if (user === undefined) {
+        throw new Unauthorized("Unauthorized");
+    }
+
+    res.status(200).send(user)
 }

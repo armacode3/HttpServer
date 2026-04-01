@@ -2,9 +2,9 @@ import express from "express";
 import { handlerReadiness } from "./api/readiness.js";
 import { middlewareLogResponses } from "./api/responses.js";
 import { middlewareMetricsInc, handlerMetrics, handlerReset } from "./api/metrics.js";
-import { handlerChirpsCreate, handlerChirps, handlerGetChirp } from "./api/chirps.js";
+import { handlerChirpsCreate, handlerChirps, handlerGetChirp, handlerDeleteChirp } from "./api/chirps.js";
 import { middlewareError } from "./api/errors.js";
-import { handlerUsers, handlerLogin, handlerRefesh, handlerRevoke } from "./api/users.js";
+import { handlerUsers, handlerLogin, handlerRefesh, handlerRevoke, handlerUpdate } from "./api/users.js";
 const app = express();
 const PORT = 8080;
 app.use(express.json());
@@ -31,6 +31,14 @@ app.get("/api/chirps/:chirpId", async (req, res, next) => {
         next(err);
     }
 });
+app.delete("/api/chirps/:chirpId", async (req, res, next) => {
+    try {
+        await handlerDeleteChirp(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
 app.post("/admin/reset", async (req, res, next) => {
     try {
         await handlerReset(req, res);
@@ -50,6 +58,14 @@ app.post("/api/chirps", async (req, res, next) => {
 app.post("/api/users", async (req, res, next) => {
     try {
         await handlerUsers(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.put("/api/users", async (req, res, next) => {
+    try {
+        await handlerUpdate(req, res);
     }
     catch (err) {
         next(err);

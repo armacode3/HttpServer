@@ -1,5 +1,5 @@
-import { BadRequest, Unauthorized } from "./errors.js";
-import { createChirp, getChirps, getChirp } from "../db/queries/chirps.js";
+import { BadRequest, Unauthorized, NotFound, Forbidden } from "./errors.js";
+import { createChirp, getChirps, getChirp, deleteChirp } from "../db/queries/chirps.js";
 import { validateJWT, getBearerToken } from "../auth.js";
 import { config } from "../config.js";
 export async function handlerChirpsCreate(req, res) {
@@ -42,8 +42,30 @@ export async function handlerGetChirp(req, res) {
     }
     const result = await getChirp(chirpId);
     if (!result) {
-        res.status(404);
-        return;
+        throw new NotFound("Chirp not found");
     }
     res.status(200).send(result);
+}
+export async function handlerDeleteChirp(req, res) {
+    const { chirpId } = req.params;
+    if (typeof chirpId !== "string") {
+        throw new BadRequest("Error occurred in chirp Id");
+    }
+    const token = getBearerToken(req);
+    if (!token) {
+        throw new Unauthorized("Missing or malformed access token");
+    }
+    const userId = validateJWT(token, config.apiConfig.secret);
+    if (!userId) {
+        throw new Unauthorized("Missing or malformed access token");
+    }
+    const chirp = await getChirp(chirpId);
+    if (!chirp) {
+        throw new NotFound("Chirp not found");
+    }
+    if (chirp.user_id !== userId) {
+        throw new Forbidden("You cannot delete this chirp");
+    }
+    await deleteChirp(chirpId);
+    res.status(204).send();
 }
