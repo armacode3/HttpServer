@@ -5,6 +5,7 @@ import { middlewareMetricsInc, handlerMetrics, handlerReset } from "./api/metric
 import { handlerChirpsCreate, handlerChirps, handlerGetChirp, handlerDeleteChirp } from "./api/chirps.js";
 import { middlewareError } from "./api/errors.js";
 import { handlerUsers, handlerLogin, handlerRefesh, handlerRevoke, handlerUpdate } from "./api/users.js";
+import { handlerUpgrade } from "./api/webhooks.js";
 const app = express();
 const PORT = 8080;
 app.use(express.json());
@@ -90,6 +91,14 @@ app.post("/api/refresh", async (req, res, next) => {
 app.post("/api/revoke", async (req, res, next) => {
     try {
         await handlerRevoke(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.post("/api/polka/webhooks", async (req, res, next) => {
+    try {
+        await handlerUpgrade(req, res);
     }
     catch (err) {
         next(err);

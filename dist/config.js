@@ -23,6 +23,14 @@ const secret = () => {
         throw new Error("SECRET does not exist");
     }
 };
+const polkakey = () => {
+    if (process.env["POLKA_KEY"] !== undefined) {
+        return process.env["POLKA_KEY"];
+    }
+    else {
+        throw new Error("POLKA_KEY does not exist");
+    }
+};
 export const config = {
     dbConfig: {
         dbURL: dbUrl(),
@@ -35,5 +43,6 @@ export const config = {
         dbURL: dbUrl(),
         platform: platform(),
         secret: secret(),
+        polkakey: polkakey(),
     }
 };

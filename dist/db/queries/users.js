@@ -14,6 +14,10 @@ export async function getUser(email) {
     return result;
 }
 export async function updateUser(userId, email, hashedPassword) {
-    const [result] = await db.update(users).set({ email: email, hashedPassword: hashedPassword, updatedAt: new Date() }).where(eq(users.id, userId)).returning({ id: users.id, email: users.email, createdAt: users.createdAt, updatedAt: users.updatedAt });
+    const [result] = await db.update(users).set({ email: email, hashedPassword: hashedPassword, updatedAt: new Date() }).where(eq(users.id, userId)).returning({ id: users.id, email: users.email, createdAt: users.createdAt, updatedAt: users.updatedAt, isChirpyRed: users.isChirpyRed });
+    return result;
+}
+export async function upgradeUser(userId) {
+    const [result] = await db.update(users).set({ isChirpyRed: true }).where(eq(users.id, userId)).returning({ id: users.id, email: users.email, createdAt: users.createdAt, updatedAt: users.updatedAt, isChirpyRed: users.isChirpyRed });
     return result;
 }

@@ -57,3 +57,14 @@ export function makeRefreshToken() {
     const buf = randomBytes(256).toString('hex');
     return buf;
 }
+export function getAPIKey(req) {
+    const token = req.get("Authorization")?.trim();
+    if (token == undefined) {
+        return "";
+    }
+    const split = token.split(/\s+/);
+    if (split.length !== 2 || split[0].toLowerCase() !== "apikey") {
+        return "";
+    }
+    return split[1].trim();
+}

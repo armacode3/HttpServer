@@ -26,11 +26,20 @@ const secret = () => {
     }
 }
 
+const polkakey = () => {
+    if (process.env["POLKA_KEY"] !== undefined) {
+        return process.env["POLKA_KEY"];
+    } else {
+        throw new Error("POLKA_KEY does not exist");
+    }
+}
+
 export type APIConfig = {
     fileServerHits: number;
     dbURL: string;
     platform: string;
     secret: string;
+    polkakey: string;
 };
 
 export type DBConfig = {
@@ -55,6 +64,7 @@ export const config: Config = {
         dbURL: dbUrl(),
         platform: platform(),
         secret: secret(),
+        polkakey: polkakey(),
     }
 };
 

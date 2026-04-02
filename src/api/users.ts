@@ -18,7 +18,7 @@ export async function handlerUsers(req: Request, res: Response) {
     if (user === undefined) {
         throw new BadRequest("Error occurred in adding user");
     }
-    res.status(201).send({ id: user.id, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt });
+    res.status(201).send({ id: user.id, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt, isChirpyRed: user.isChirpyRed });
 }
 
 
@@ -49,7 +49,7 @@ export async function handlerLogin(req: Request, res: Response) {
 
     const result = await insertRefreshToken({ token: refreshToken, user_id: user.id, expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000) , revokedAt: null});
 
-    res.status(200).send({ id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt, email: user.email, token: token, refreshToken:  refreshToken})
+    res.status(200).send({ id: user.id, createdAt: user.createdAt, updatedAt: user.updatedAt, email: user.email, isChirpyRed: user.isChirpyRed, token: token, refreshToken:  refreshToken})
 }
 
 export async function handlerRefesh(req: Request, res: Response) {
